@@ -1,4 +1,4 @@
-# Custom ServeMux for use with github.com/miekg/dns.
+# Custom ServeMux for use with [github.com/miekg/dns](https://github.com/miekg/dns)
 
 It curently supports the following queries (name + type):
 * time.<zone> TXT: Returns the current UTC time in RFC3339 format.
