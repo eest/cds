@@ -8,8 +8,7 @@ import (
 func handleTime(parentZone Zone, request, response *dns.Msg) {
 	switch request.Question[0].Qtype {
 	case dns.TypeTXT:
-		response.Answer = append(
-			response.Answer,
+		response.Answer = []dns.RR{
 			&dns.TXT{
 				Hdr: dns.RR_Header{
 					Name:   request.Question[0].Name,
@@ -19,7 +18,7 @@ func handleTime(parentZone Zone, request, response *dns.Msg) {
 				},
 				Txt: []string{time.Now().UTC().Format(time.RFC3339)},
 			},
-		)
+		}
 	default:
 		response.Ns = []dns.RR{
 			&dns.SOA{

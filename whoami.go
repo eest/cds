@@ -7,8 +7,7 @@ import (
 func handleWhoami(parentZone Zone, writer dns.ResponseWriter, request, response *dns.Msg) {
 	switch request.Question[0].Qtype {
 	case dns.TypeTXT:
-		response.Answer = append(
-			response.Answer,
+		response.Answer = []dns.RR{
 			&dns.TXT{
 				Hdr: dns.RR_Header{
 					Name:   request.Question[0].Name,
@@ -18,7 +17,7 @@ func handleWhoami(parentZone Zone, writer dns.ResponseWriter, request, response 
 				},
 				Txt: []string{writer.RemoteAddr().String()},
 			},
-		)
+		}
 
 	default:
 		response.Ns = []dns.RR{
