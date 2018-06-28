@@ -30,10 +30,14 @@ func NewServeMux(zones map[string]Zone) *ServeMux {
 // ServeDNS makes ServeMux implement the dns.Handler interface.
 func (s *ServeMux) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 
+	// Make sure we have a lowercase version of the query name for easy
+	// comparision
+	questionName := strings.ToLower(r.Question[0].Name)
+
 	// Check that we are configured to respond to the zone.
 	var parentZone string
 	for zone := range s.zones {
-		if dns.IsSubDomain(zone, r.Question[0].Name) {
+		if dns.IsSubDomain(zone, questionName) {
 			parentZone = zone
 			break
 		}
@@ -50,10 +54,10 @@ func (s *ServeMux) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		m.Authoritative = true
 
 		switch {
-		case strings.HasPrefix(r.Question[0].Name, "time."):
+		case strings.HasPrefix(questionName, "time."):
 			handleTime(s.zones[parentZone], r, m)
 
-		case strings.HasPrefix(r.Question[0].Name, "whoami."):
+		case strings.HasPrefix(questionName, "whoami."):
 			handleWhoami(s.zones[parentZone], w, r, m)
 
 		default:
