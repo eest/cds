@@ -30,43 +30,50 @@ func NewServeMux(zones map[string]Zone) *ServeMux {
 // ServeDNS makes ServeMux implement the dns.Handler interface.
 func (s *ServeMux) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 
-	// Make sure we have a lowercase version of the query name for easy
-	// comparision
-	questionName := strings.ToLower(r.Question[0].Name)
-
-	// Check that we are configured to respond to the zone.
-	var parentZone string
-	for zone := range s.zones {
-		if dns.IsSubDomain(zone, questionName) {
-			parentZone = zone
-			break
-		}
-	}
-
 	// We will always send a reply at this point, so set up initial
 	// reply message.
 	m := new(dns.Msg)
 	m.SetReply(r)
 
-	if parentZone != "" {
-		// The query belongs to a configured zone, any response
-		// should be authoritative.
-		m.Authoritative = true
+	// We require at least one question in the question section.
+	if len(r.Question) > 0 {
 
-		switch {
-		case strings.HasPrefix(questionName, "time."):
-			handleTime(s.zones[parentZone], r, m)
+		// Make sure we have a lowercase version of the query name for easy
+		// comparision
+		questionName := strings.ToLower(r.Question[0].Name)
 
-		case strings.HasPrefix(questionName, "whoami."):
-			handleWhoami(s.zones[parentZone], w, r, m)
+		// Check that we are configured to respond to the zone.
+		var parentZone string
+		for zone := range s.zones {
+			if dns.IsSubDomain(zone, questionName) {
+				parentZone = zone
+				break
+			}
+		}
 
-		default:
-			m.MsgHdr.Rcode = dns.RcodeNameError
+		if parentZone != "" {
+			// The query belongs to a configured zone, any response
+			// should be authoritative.
+			m.Authoritative = true
+
+			switch {
+			case strings.HasPrefix(questionName, "time."):
+				handleTime(s.zones[parentZone], r, m)
+
+			case strings.HasPrefix(questionName, "whoami."):
+				handleWhoami(s.zones[parentZone], w, r, m)
+
+			default:
+				m.MsgHdr.Rcode = dns.RcodeNameError
+			}
+		} else {
+			// We are not configured for the queried zone, return
+			// REFUSED.
+			m.MsgHdr.Rcode = dns.RcodeRefused
 		}
 	} else {
-		// We are not configured for the queried zone, return
-		// REFUSED.
-		m.MsgHdr.Rcode = dns.RcodeRefused
+		// There was no question in the question section, this is not expected.
+		m.MsgHdr.Rcode = dns.RcodeFormatError
 	}
 
 	// Send the reply.
