@@ -19,12 +19,13 @@ func main() {
 	serveMux := cds.NewServeMux(map[string]cds.Zone{
 		"example.com.": {
 			TTL:     300,
-			Ns:      "mname.example.com.",
+			Mname:   "mname.example.com.",
 			Mbox:    "hostmaster.example.com.",
 			Refresh: 14400,
 			Retry:   3600,
 			Expire:  2419200,
 			Minimum: 300,
+			Ns:      []string{"ns1.example.com.", "ns2.example.com."},
 		},
 	})
 
