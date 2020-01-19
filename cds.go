@@ -2,6 +2,7 @@ package cds
 
 import (
 	"github.com/miekg/dns"
+	"log"
 	"strings"
 )
 
@@ -77,5 +78,8 @@ func (s *ServeMux) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	}
 
 	// Send the reply.
-	w.WriteMsg(m)
+	err := w.WriteMsg(m)
+	if err != nil {
+		log.Printf("failed sending response: %s", err)
+	}
 }

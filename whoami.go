@@ -19,6 +19,18 @@ func handleWhoami(parentZone Zone, writer dns.ResponseWriter, request, response 
 			},
 		}
 
+	case dns.TypeNS:
+		response.Answer = []dns.RR{
+			&dns.NS{
+				Hdr: dns.RR_Header{
+					Name:   request.Question[0].Name,
+					Rrtype: dns.TypeNS,
+					Class:  dns.ClassINET,
+					Ttl:    3600,
+				},
+				Ns: "ns1.example.com.",
+			},
+		}
 	default:
 		response.Ns = []dns.RR{
 			&dns.SOA{
