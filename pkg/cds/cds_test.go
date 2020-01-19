@@ -2,7 +2,7 @@ package cds_test
 
 import (
 	"fmt"
-	"github.com/eest/cds"
+	"github.com/eest/cds/pkg/cds"
 	"github.com/miekg/dns"
 	"log"
 	"testing"
