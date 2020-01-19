@@ -14,13 +14,14 @@ type ServeMux struct {
 // Zone describes the SOA contents for a configured zone.
 type Zone struct {
 	TTL     uint32
-	Ns      string
+	Mname   string
 	Mbox    string
 	Serial  uint32
 	Refresh uint32
 	Retry   uint32
 	Expire  uint32
 	Minimum uint32
+	Ns      []string
 }
 
 // NewServeMux returns a configured ServeMux

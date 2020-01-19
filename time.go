@@ -20,16 +20,20 @@ func handleTime(parentZone Zone, request, response *dns.Msg) {
 			},
 		}
 	case dns.TypeNS:
-		response.Answer = []dns.RR{
-			&dns.NS{
-				Hdr: dns.RR_Header{
-					Name:   request.Question[0].Name,
-					Rrtype: dns.TypeNS,
-					Class:  dns.ClassINET,
-					Ttl:    3600,
+		response.Answer = []dns.RR{}
+		for _, ns := range parentZone.Ns {
+			response.Answer = append(
+				response.Answer,
+				&dns.NS{
+					Hdr: dns.RR_Header{
+						Name:   request.Question[0].Name,
+						Rrtype: dns.TypeNS,
+						Class:  dns.ClassINET,
+						Ttl:    3600,
+					},
+					Ns: ns,
 				},
-				Ns: "ns1.example.com.",
-			},
+			)
 		}
 	default:
 		response.Ns = []dns.RR{
@@ -40,7 +44,7 @@ func handleTime(parentZone Zone, request, response *dns.Msg) {
 					Class:  dns.ClassINET,
 					Ttl:    parentZone.TTL,
 				},
-				Ns:      parentZone.Ns,
+				Ns:      parentZone.Mname,
 				Mbox:    parentZone.Mbox,
 				Serial:  parentZone.Serial,
 				Refresh: parentZone.Refresh,
