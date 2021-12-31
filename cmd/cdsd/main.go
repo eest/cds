@@ -3,7 +3,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/eest/cds"
+	"github.com/eest/cds/pkg/cds"
 	"github.com/miekg/dns"
 	"log"
 	"os"
